@@ -28,7 +28,7 @@ FitBit Analysis
 ggplot(data=daily_activity, aes(x=TotalSteps, y=SedentaryMinutes, color=LightlyActiveMinutes)) + geom_point() + labs(title="Daily Activity") + theme(legend.position=c(0.8,0.2))
 ```
 
-![](FitBit_R_Script_files/figure-gfm/Daily%20Activity-1.png)<!-- -->
+![](FitBit_R_Figures/DailyActivityAll.png)<!-- -->
 
 ### Average Usage per Day / Week
 
@@ -77,7 +77,7 @@ ggplot(hourly_step_avg, aes(x = hour, y = avg_steps_hour)) +
   )
 ```
 
-![](FitBit_R_Script_files/figure-gfm/Steps%20per%20Hour%20and%20Day-1.png)<!-- -->
+![](FitBit_R_Script_files/figure-gfm/Steps%20per%20Hour%20and%20DaySteps.png)<!-- -->
 
 ``` r
 # Summarize first
