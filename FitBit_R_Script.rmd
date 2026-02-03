@@ -1,0 +1,362 @@
+
+
+```{r Environment Setup, include = FALSE}
+#install.packages('tidyverse')
+library(tidyverse)
+library(lubridate)
+library(dplyr)
+```
+
+
+
+```{r Load dailyActivity, include = FALSE}
+daily_activity <- read.csv("dailyActivity_merged.csv")
+colnames(daily_activity)
+n_distinct(daily_activity$Id)
+nrow(daily_activity)
+
+daily_activity %>%  
+  select(TotalSteps,
+         TotalDistance,
+         SedentaryMinutes) %>%
+  summary()
+
+head(daily_activity)
+
+
+```
+
+
+```{r Load sleepDay, include = FALSE}
+sleep_day <- read.csv("sleepDay_merged.csv")
+colnames(sleep_day)
+n_distinct(sleep_day$Id)
+nrow(sleep_day)
+
+sleep_day %>%  
+  select(TotalSleepRecords,
+         TotalMinutesAsleep,
+         TotalTimeInBed) %>%
+  summary()
+
+head(sleep_day)
+
+```
+
+
+```{r Load dailyCalories, include = FALSE}
+daily_calories <- read.csv("dailyCalories_merged.csv")
+colnames(daily_calories)
+n_distinct(daily_calories$Id)
+nrow(daily_calories)
+
+daily_calories %>%  
+  select(Calories) %>%
+  summary()
+
+head(daily_calories)
+
+```
+
+
+```{r Load hourlySteps, include = FALSE}
+hourly_steps <- read.csv("hourlySteps_merged.csv")
+colnames(hourly_steps)
+n_distinct(hourly_steps$Id)
+nrow(hourly_steps)
+
+hourly_steps %>%  
+  select(StepTotal) %>%
+  summary()
+
+head(hourly_steps)
+
+```
+
+
+```{r Load Heart Rate, include = FALSE}
+heartrate <- read.csv("heartrate_seconds_merged.csv")
+colnames(heartrate)
+n_distinct(heartrate$Id)
+nrow(heartrate)
+
+heartrate %>%  
+  select(Value) %>%
+  summary()
+
+head(heartrate)
+
+```
+
+
+```{r Load Minute Steps, include = FALSE}
+minute_steps <- read.csv("minuteStepsNarrow_merged.csv")
+colnames(minute_steps)
+n_distinct(minute_steps$Id)
+nrow(minute_steps)
+
+minute_steps %>%  
+  select(Steps) %>%
+  summary()
+
+head(minute_steps)
+
+```
+
+
+
+```{r Mutations, include = FALSE}
+heartrate <- heartrate %>%
+  mutate(
+    datetime    = mdy_hms(Time),
+    date        = date(datetime),
+    day_of_week = wday(datetime),
+    hour        = hour(datetime),          # 0–23
+    date        = date(datetime),
+    month       = month(date)
+  )
+head(heartrate)
+n_distinct(heartrate$Id)
+
+
+
+sleep_day <- sleep_day %>%
+  mutate(
+    datetime    = mdy_hms(SleepDay),
+    date        = date(datetime),
+    day_of_week = wday(datetime),
+#    hour        = hour(datetime),          # 0–23
+    date        = date(datetime),
+    month       = month(date)
+  )
+head(sleep_day)
+n_distinct(sleep_day$Id)
+
+
+
+hourly_steps <- hourly_steps %>%
+  mutate(
+    datetime    = mdy_hms(ActivityHour),
+    date        = date(datetime),
+    day_of_week = wday(datetime),
+    hour        = hour(datetime),          # 0–23
+    date        = date(datetime)
+  )
+head(hourly_steps)
+
+
+daily_activity <- daily_activity %>%
+  mutate(
+    date    = mdy(ActivityDate),
+    #date        = date(datetime),
+    day_of_week = wday(date),
+    #hour        = hour(datetime),          # 0–23
+    #date        = date(datetime)
+  )
+head(daily_activity)
+
+
+minute_steps <- minute_steps %>%
+  mutate(
+    datetime    = mdy_hms(ActivityMinute),
+    date        = date(datetime),
+    day_of_week = wday(datetime),
+    hour        = hour(datetime),          # 0–23
+    date        = date(datetime),
+    month       = month(date)
+  )
+head(minute_steps)
+n_distinct(minute_steps$Id)
+
+```
+
+
+
+
+
+```{r Merging, include = FALSE}
+combined_data <- merge(daily_activity, sleep_day, by=c("Id","date"))
+
+
+n_distinct(combined_data$Id)
+colnames(combined_data)
+head(combined_data)
+
+```
+
+
+# Smart Device Growth Opportunities
+
+### What can trends in smart device use tell us about marketing opportunities?
+
+##### Richard Overman
+##### 02/02/26
+
+
+### Purpose: Find Trends in Smart Device Data
+##### * Data Used: FitBit Fitness Tracker Dataset: https://www.kaggle.com/datasets/arashnic/fitbit
+##### * Data Preparation: Merging of Daily Activity and Sleep Datasets
+##### * Analysis: Comparison across multiple categories, day of week, time of day.
+
+
+### Total population of samples in Daily Activity dataset.
+##### * Top population includes devices with 24 hours (1440 minutes) of sedentary minutes – devices not worn all day.
+##### * Bottom population suspected to be devices worn 24 hours.
+
+```{r Daily Activity}
+ggplot(data=daily_activity, aes(x=TotalSteps, y=SedentaryMinutes, color=LightlyActiveMinutes)) + geom_point() + labs(title="Daily Activity") + theme(legend.position=c(0.8,0.2))
+
+```
+
+
+### Average Usage per Day / Week
+
+```{r Steps per Hour and Day}
+# Summarize first
+hourly_step_avg <- minute_steps %>%
+  group_by(hour) %>%
+  summarise(
+    avg_steps_hour = mean(Steps, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# Now plot the averages
+ggplot(hourly_step_avg, aes(x = hour, y = avg_steps_hour)) +
+  # Subtle area fill under the line
+  geom_area(fill = "#2c7bb6", alpha = 0.15) +
+  
+  # Main line (thicker for better visibility)
+  geom_line(linewidth = 1.2, color = "#2c7bb6") +
+  
+  # Optional: small points at each hour for emphasis
+  # geom_point(size = 2, color = "#2c7bb6", alpha = 0.8) +
+  
+  labs(
+    title    = "Average Steps per Hour",
+    x        = "Hour of Day",
+    y        = "Average Steps"
+  ) +
+  
+  # Key change: ticks & labels every 3 hours, including 24
+  scale_x_continuous(
+    breaks = seq(0, 24, by = 3),
+    labels = c("0", "3", "6", "9", "12", "15", "18", "21", "24"),
+    expand = c(0.01, 0)   # reduces empty space at edges
+  ) +
+  
+  theme_minimal(base_size = 13) +
+  theme(
+    #plot.title      = element_text(size = 16, margin = margin(b = 10)),
+    #axis.title      = element_text(face = "bold"),
+    #axis.text.x     = element_text(size = 10),
+    panel.grid.major.x = element_line(color = "grey92", linewidth = 0.35),
+    panel.grid.minor.x = element_blank(),
+    panel.grid.major.y = element_line(color = "grey92", linewidth = 0.4),
+    plot.margin     = margin(12, 16, 12, 16)
+  )
+
+
+
+
+
+# Summarize first
+hourly_steps_avg <- hourly_steps %>%
+  group_by(day_of_week) %>%
+  summarise(
+    avg_steps_per_weekday = mean(StepTotal, na.rm = TRUE),
+    .groups = "drop"
+  )
+hourly_steps_avg <- hourly_steps_avg %>%
+  mutate(day_of_week = factor(day_of_week,
+                               levels = 1:7,
+                               labels = c("Sunday", "Monday", "Tuesday",
+                                          "Wednesday", "Thursday", "Friday", "Saturday")))
+# Now plot the averages
+ggplot(hourly_steps_avg, aes(x = day_of_week, y = avg_steps_per_weekday)) +
+  geom_col(fill = "steelblue") +           # bars are very common for averages
+  labs(
+    title = "Average Steps by Day of Week",
+    x = "Day of Week",
+    y = "Average Steps"
+  ) +
+  theme_minimal()
+
+
+```
+
+### Merged Daily Activity with Sleep Data
+
+```{r Merged}
+
+
+ggplot(data=combined_data, aes(x=TotalSteps, y=SedentaryMinutes, color=TotalTimeInBed)) + geom_point() + theme(legend.position=c(0.9,0.21)) + labs(title="Steps vs Sedentary Minutes")
+
+
+ggplot(data=combined_data, aes(x=SedentaryMinutes, y=TotalTimeInBed, color=TotalSteps)) + geom_point() + theme(legend.position=c(0.85,0.75)) + labs(title = "Sleep vs Sedentary Minutes")
+
+
+
+```
+
+<!--
+```{r Extras}
+
+ggplot(data=combined_data, aes(x=TotalSteps, y=SedentaryMinutes, color=TotalMinutesAsleep)) + geom_point() + theme(legend.position=c(0.9,0.21))
+
+
+ggplot(data=combined_data, aes(x=TotalMinutesAsleep, y=TotalTimeInBed, color=TotalSteps)) + geom_point()
+
+
+ggplot(data=combined_data %>% filter(TotalSteps > 0), aes(x=TotalSteps, y=Calories, color=day_of_week.x)) + 
+  geom_point()
+
+ggplot(data=combined_data %>% filter(TotalSteps > 0), aes(x=TotalSteps, y=Calories, color=day_of_week.x)) + 
+  geom_point() +
+  facet_wrap(~Id)
+
+
+# Summarize first
+hourly_hr_avg <- heartrate %>%
+  group_by(hour) %>%
+  summarise(
+    avg_hr_hour = mean(Value, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# Now plot the averages
+ggplot(hourly_hr_avg, aes(x = hour, y = avg_hr_hour)) +
+  geom_line() +           # bars are very common for averages
+  labs(
+    title = "Average Heartrate per Hour",
+    x = "Hour",
+    y = "Average Heartrate"
+  ) +
+  theme_minimal()
+
+
+
+
+# Summarize first
+hourly_hr_max <- heartrate %>%
+  group_by(hour) %>%
+  summarise(
+    max_hr_hour = max(Value, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# Now plot the averages
+ggplot(hourly_hr_max, aes(x = hour, y = max_hr_hour)) +
+  geom_line() +           # bars are very common for averages
+  labs(
+    title = "Max Heartrate per Hour",
+    x = "Hour",
+    y = "Max Heartrate"
+  ) +
+  theme_minimal()
+
+
+
+```
+
+
+-->
