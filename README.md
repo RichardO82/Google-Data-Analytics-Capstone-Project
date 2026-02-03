@@ -103,7 +103,7 @@ ggplot(hourly_steps_avg, aes(x = day_of_week, y = avg_steps_per_weekday)) +
   theme_minimal()
 ```
 
-![](FitBit_R_FiguresDaySteps.png)<!-- -->
+![](FitBit_R_Figures/DaySteps.png)<!-- -->
 
 ### Merged Daily Activity with Sleep Data
 
@@ -111,11 +111,11 @@ ggplot(hourly_steps_avg, aes(x = day_of_week, y = avg_steps_per_weekday)) +
 ggplot(data=combined_data, aes(x=TotalSteps, y=SedentaryMinutes, color=TotalTimeInBed)) + geom_point() + theme(legend.position=c(0.9,0.21)) + labs(title="Steps vs Sedentary Minutes")
 ```
 
-![](FitBit_R_Figures/MergedSteps-1.png)<!-- -->
+![](FitBit_R_Figures/MergedSteps.png)<!-- -->
 
 ``` r
 ggplot(data=combined_data, aes(x=SedentaryMinutes, y=TotalTimeInBed, color=TotalSteps)) + geom_point() + theme(legend.position=c(0.85,0.75)) + labs(title = "Sleep vs Sedentary Minutes")
 ```
 
-![](FitBit_R_Script_files/figure-gfm/MergedSleep.png)<!-- -->
+![](FitBit_R_Figures/MergedSleep.png)<!-- -->
 
