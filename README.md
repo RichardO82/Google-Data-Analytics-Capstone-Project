@@ -77,7 +77,7 @@ ggplot(hourly_step_avg, aes(x = hour, y = avg_steps_hour)) +
   )
 ```
 
-![](FitBit_R_Script_files/figure-gfm/Steps%20per%20Hour%20and%20DaySteps.png)<!-- -->
+![](FitBit_R_Figures/HourSteps.png)<!-- -->
 
 ``` r
 # Summarize first
@@ -103,7 +103,7 @@ ggplot(hourly_steps_avg, aes(x = day_of_week, y = avg_steps_per_weekday)) +
   theme_minimal()
 ```
 
-![](FitBit_R_Script_files/figure-gfm/Steps%20per%20Hour%20and%20Day-2.png)<!-- -->
+![](FitBit_R_FiguresDaySteps.png)<!-- -->
 
 ### Merged Daily Activity with Sleep Data
 
@@ -111,83 +111,11 @@ ggplot(hourly_steps_avg, aes(x = day_of_week, y = avg_steps_per_weekday)) +
 ggplot(data=combined_data, aes(x=TotalSteps, y=SedentaryMinutes, color=TotalTimeInBed)) + geom_point() + theme(legend.position=c(0.9,0.21)) + labs(title="Steps vs Sedentary Minutes")
 ```
 
-![](FitBit_R_Script_files/figure-gfm/Merged-1.png)<!-- -->
+![](FitBit_R_Figures/MergedSteps-1.png)<!-- -->
 
 ``` r
 ggplot(data=combined_data, aes(x=SedentaryMinutes, y=TotalTimeInBed, color=TotalSteps)) + geom_point() + theme(legend.position=c(0.85,0.75)) + labs(title = "Sleep vs Sedentary Minutes")
 ```
 
-![](FitBit_R_Script_files/figure-gfm/Merged-2.png)<!-- -->
+![](FitBit_R_Script_files/figure-gfm/MergedSleep.png)<!-- -->
 
-<!--
-&#10;``` r
-ggplot(data=combined_data, aes(x=TotalSteps, y=SedentaryMinutes, color=TotalMinutesAsleep)) + geom_point() + theme(legend.position=c(0.9,0.21))
-```
-&#10;![](FitBit_R_Script_files/figure-gfm/Extras-1.png)<!-- -->
-
-``` r
-ggplot(data=combined_data, aes(x=TotalMinutesAsleep, y=TotalTimeInBed, color=TotalSteps)) + geom_point()
-```
-
-![](FitBit_R_Script_files/figure-gfm/Extras-2.png)<!-- -->
-
-``` r
-ggplot(data=combined_data %>% filter(TotalSteps > 0), aes(x=TotalSteps, y=Calories, color=day_of_week.x)) + 
-  geom_point()
-```
-
-![](FitBit_R_Script_files/figure-gfm/Extras-3.png)<!-- -->
-
-``` r
-ggplot(data=combined_data %>% filter(TotalSteps > 0), aes(x=TotalSteps, y=Calories, color=day_of_week.x)) + 
-  geom_point() +
-  facet_wrap(~Id)
-```
-
-![](FitBit_R_Script_files/figure-gfm/Extras-4.png)<!-- -->
-
-``` r
-# Summarize first
-hourly_hr_avg <- heartrate %>%
-  group_by(hour) %>%
-  summarise(
-    avg_hr_hour = mean(Value, na.rm = TRUE),
-    .groups = "drop"
-  )
-
-# Now plot the averages
-ggplot(hourly_hr_avg, aes(x = hour, y = avg_hr_hour)) +
-  geom_line() +           # bars are very common for averages
-  labs(
-    title = "Average Heartrate per Hour",
-    x = "Hour",
-    y = "Average Heartrate"
-  ) +
-  theme_minimal()
-```
-
-![](FitBit_R_Script_files/figure-gfm/Extras-5.png)<!-- -->
-
-``` r
-# Summarize first
-hourly_hr_max <- heartrate %>%
-  group_by(hour) %>%
-  summarise(
-    max_hr_hour = max(Value, na.rm = TRUE),
-    .groups = "drop"
-  )
-
-# Now plot the averages
-ggplot(hourly_hr_max, aes(x = hour, y = max_hr_hour)) +
-  geom_line() +           # bars are very common for averages
-  labs(
-    title = "Max Heartrate per Hour",
-    x = "Hour",
-    y = "Max Heartrate"
-  ) +
-  theme_minimal()
-```
-
-![](FitBit_R_Script_files/figure-gfm/Extras-6.png)<!-- -->
-
-–\>
