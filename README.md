@@ -2,4 +2,4 @@
 Capstone Project from the Coursera Certificate in Google Data Analytics
 
 
-[![HTML report preview]](FitBit_Report.html)
+[![HTML report preview]](FitBit_R_Script.html)
