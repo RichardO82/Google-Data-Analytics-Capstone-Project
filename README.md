@@ -10,7 +10,7 @@ FitBit Analysis
 
 ##### 02/02/26
 
-### Purpose: Find Trends in Smart Device Data
+### Purpose: Explore trends in smart device data to exploit for marketing opportunities.
 
 ##### \* Data Used: FitBit Fitness Tracker Dataset: <https://www.kaggle.com/datasets/arashnic/fitbit>
 
